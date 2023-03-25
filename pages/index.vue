@@ -1,20 +1,10 @@
 <script lang="ts" setup>
-	let counter = useState('counter', () => 1)
+	
+</script>
 
-	var akgfj: number
-
-	const bird: string = "kerem"
-
-
-	function increment() {
-		counter.value = counter.value + 1;
-	}
-	</script>
-
-	<template>
+<template>
 	<div>
-		<button @click="() => {increment()}">{{ counter }}</button>
-		<button>{{ counter }}</button>
+		<p>Merhaba</p>
 	</div>
 </template>
 
