@@ -35,7 +35,6 @@ header {
   width: 100%;
   position: relative;
   margin-top: 2rem;
-  border: 1px solid black;
 }
 
 img {
