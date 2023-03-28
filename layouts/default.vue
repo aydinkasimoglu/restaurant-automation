@@ -1,20 +1,18 @@
 <template>
-  <div>
-    <header>
-      <NuxtLink to="/"><img src="/logo.png" alt="logo" /></NuxtLink>
+  <header>
+    <NuxtLink to="/"><img src="/logo.png" alt="logo" /></NuxtLink>
 
-      <nav role="navigation">
-        <NuxtLink to="/menu" class="nav-item">MENÜ</NuxtLink>
-        <NuxtLink to="/siparisler" class="nav-item">SİPARİŞLER</NuxtLink>
-        <NuxtLink to="/masalar" class="nav-item">MASALAR</NuxtLink>
-        <NuxtLink to="/stoklar" class="nav-item">STOKLAR</NuxtLink>
-        <NuxtLink to="/calisanlar" class="nav-item">ÇALIŞANLAR</NuxtLink>
-      </nav>
-    </header>
+    <nav role="navigation">
+      <NuxtLink to="/menu" class="nav-item">MENÜ</NuxtLink>
+      <NuxtLink to="/siparisler" class="nav-item">SİPARİŞLER</NuxtLink>
+      <NuxtLink to="/masalar" class="nav-item">MASALAR</NuxtLink>
+      <NuxtLink to="/stoklar" class="nav-item">STOKLAR</NuxtLink>
+      <NuxtLink to="/calisanlar" class="nav-item">ÇALIŞANLAR</NuxtLink>
+    </nav>
+  </header>
 
-    <div id="container">
-      <slot />
-    </div>
+  <div id="container">
+    <slot />
   </div>
 </template>
 
@@ -22,15 +20,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap");
 
 body {
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
+  height: 100vh;
   background-color: #f9f5e7;
 }
 
 header {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
   width: 100%;
   position: relative;
@@ -68,5 +66,7 @@ nav {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 2rem;
+  height: calc(100vh - 9rem);
 }
 </style>
