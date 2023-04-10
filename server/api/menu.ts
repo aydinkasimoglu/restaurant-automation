@@ -1,31 +1,40 @@
 import mysql from "mysql"
 
 type Yiyecek = {
-  ad: number
+  ad: string
   tur: string
   fiyat: number
 }
 
-let yiyecekler: Yiyecek[] = []
-
-export default defineEventHandler(event => {
+export default defineEventHandler(async event => {
   const connection: mysql.Connection = event.context.connection
 
-  connection.query("USE Restoran", error => {
-    if (error) throw error
-    console.log("Veri tabanı kullanıldı")
+  try {
+    const yiyecekler = await getYiyeceklerList(connection) as Yiyecek[]
 
-    connection.query("SELECT Yiyecek.ad AS ad, Yiyecek.fiyat AS fiyat, YiyecekTur.ad AS tur "+
-                     "FROM Yiyecek "+
-                     "JOIN YiyecekTur ON Yiyecek.tur_id = YiyecekTur.yiyecektur_id", handleQuery)
-  })
+    return yiyecekler
+  } catch (error) {
+    console.error(error)
 
-  return yiyecekler
+    throw new Error("Yiyecekler listelenemedi")
+  }
 })
 
-function handleQuery(error: mysql.MysqlError, result: Yiyecek[]) {
-  if (error) throw error
-  console.log("Yiyecekler alındı")
+function getYiyeceklerList(connection: mysql.Connection) {
+  return new Promise((resolve, reject) => {
+    connection.query("USE Restoran", error => {
+      if (error) throw error
+      console.log("Veri tabanı kullanıldı")
 
-  yiyecekler = result
+      connection.query(`
+        SELECT Yiyecek.ad AS ad, Yiyecek.fiyat AS fiyat, YiyecekTur.ad AS tur
+        FROM Yiyecek
+        JOIN YiyecekTur ON Yiyecek.tur_id = YiyecekTur.yiyecektur_id
+      `, (error, results) => {
+        if (error) reject(error)
+        console.log("Yiyecekler listelendi")
+        resolve(results)
+      })
+    })
+  })
 }
