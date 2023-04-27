@@ -1,12 +1,3 @@
-<script lang="ts" setup>
-  let dbCreated = useCookie<boolean>('dbCreated', { default: () => false })
-
-  if (!dbCreated.value) {
-    const { data } = await useFetch('/api/loadDB', { server: false })
-    dbCreated.value = data.value as boolean
-  }
-</script>
-
 <template>
 	<div>
 		<h1>LOP'a Hoş Geldiniz!</h1>
