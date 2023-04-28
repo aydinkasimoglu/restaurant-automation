@@ -4,6 +4,7 @@ type Yiyecek = {
   ad: string
   tur: string
   fiyat: number
+  fotograf: string
 }
 
 export default defineEventHandler(async event => {
@@ -27,7 +28,7 @@ function getYiyeceklerList(connection: mysql.Connection) {
       console.log("Veri tabanı kullanıldı")
 
       connection.query(`
-        SELECT Yiyecek.ad AS ad, Yiyecek.fiyat AS fiyat, YiyecekTur.ad AS tur
+        SELECT Yiyecek.ad AS ad, Yiyecek.fiyat AS fiyat, YiyecekTur.ad AS tur, Yiyecek.fotograf AS fotograf
         FROM Yiyecek
         JOIN YiyecekTur ON Yiyecek.tur_id = YiyecekTur.yiyecektur_id
       `, (error, results) => {

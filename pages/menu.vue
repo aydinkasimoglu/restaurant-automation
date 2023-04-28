@@ -27,7 +27,7 @@ if (error) {
     <div class="foods-section">
       <div class="food-box" v-for="yiyecek of yiyecekler" :key="yiyecek.ad">
         <div class="foto">
-          <img src="/example.jpg">
+          <img :src="yiyecek.fotograf">
         </div>
         <div class="info">
           <p class="type">{{ yiyecek.tur }}</p>
@@ -67,7 +67,7 @@ body {
 .features-section {
   /*background-color: red;*/
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   margin: 0px 15px;
 }
 .search-box {
