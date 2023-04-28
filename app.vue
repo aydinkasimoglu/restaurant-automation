@@ -1,10 +1,14 @@
 <script lang="ts" setup>
-  let dbCreated = useCookie<boolean>('dbCreated', { default: () => false, maxAge: 60 * 60 * 24 * 365 })
+  onMounted(async () => {
+    let dbCreated = document.cookie.split("; ").find((row) => row.startsWith("dbCreated="))?.split("=")[1] === "true";
 
-  if (!dbCreated.value) {
-    const { data } = await useFetch('/api/loadDB', { server: false })
-    dbCreated.value = data.value as boolean
-  }
+    if (!dbCreated) {
+      const { data } = await useFetch('/api/loadDB', { server: false })
+      if (data) {
+        document.cookie = "dbCreated=true"
+      }
+    }
+  })
 </script>
 
 <template>
@@ -53,11 +57,8 @@ nav {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  gap: clamp(2rem, 2vw, auto);
   background-color: #f8ead8;
   border-radius: 5px;
-  width: fit-content;
-  height: fit-content;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
 
@@ -68,7 +69,7 @@ nav {
   font-weight: bold;
   text-decoration: none;
   color: black;
-  padding: 1rem 2rem;
+  padding: 1rem clamp(1rem, 2vw, 2rem);
 }
 
 #container {
