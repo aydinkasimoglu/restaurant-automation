@@ -3,8 +3,8 @@
     let dbCreated = document.cookie.split("; ").find((row) => row.startsWith("dbCreated="))?.split("=")[1] === "true";
 
     if (!dbCreated) {
-      const { data } = await useFetch('/api/loadDB', { server: false })
-      if (data) {
+      const { data } = await useFetch('/api/loadDB')
+      if (data.value !== null) {
         document.cookie = "dbCreated=true"
       }
     }
