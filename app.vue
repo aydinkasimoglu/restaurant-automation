@@ -37,9 +37,9 @@ body {
 header {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  width: 71rem;
   position: relative;
   margin-top: 2rem;
 }
