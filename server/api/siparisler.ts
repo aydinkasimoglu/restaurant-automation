@@ -35,6 +35,7 @@ function getSiparislerList(connection: mysql.Connection) {
         FROM Siparis
         JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
         JOIN YiyecekTur ON Yiyecek.tur_id = YiyecekTur.yiyecektur_id
+        ORDER BY Siparis.siparis_tarih DESC
       `, (error, results) => {
         if (error) reject(error)
         console.log("Siparişler listelendi")
