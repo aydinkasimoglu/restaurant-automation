@@ -1,6 +1,7 @@
 import mysql from "mysql"
 
 type Siparis = {
+  siparis_id: number
   siparis_no: number
   adet: number
   ad: string
@@ -31,7 +32,7 @@ function getSiparislerList(connection: mysql.Connection) {
       console.log("Veri tabanı kullanıldı")
 
       connection.query(`
-        SELECT Siparis.siparis_no AS siparis_no, Siparis.adet AS adet, Yiyecek.ad AS ad, Yiyecek.fiyat AS fiyat, YiyecekTur.ad AS tur, Siparis.siparis_tarih AS tarih, Yiyecek.fotograf AS fotograf
+        SELECT Siparis.siparis_id AS siparis_id, Siparis.siparis_no AS siparis_no, Siparis.adet AS adet, Yiyecek.ad AS ad, Yiyecek.fiyat AS fiyat, YiyecekTur.ad AS tur, Siparis.siparis_tarih AS tarih, Yiyecek.fotograf AS fotograf
         FROM Siparis
         JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
         JOIN YiyecekTur ON Yiyecek.tur_id = YiyecekTur.yiyecektur_id
