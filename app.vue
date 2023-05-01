@@ -1,8 +1,6 @@
 <script lang="ts" setup>
   onMounted(async () => {
-    let dbCreated = document.cookie.split("; ").find((row) => row.startsWith("dbCreated="))?.split("=")[1] === "true";
-
-    if (!dbCreated) {
+    if (document.cookie.split("; ").find((row) => row.startsWith("dbCreated="))?.split("=")[1] !== "true") {
       const { data } = await useFetch('/api/loadDB')
       if (data.value !== null) {
         document.cookie = "dbCreated=true"
