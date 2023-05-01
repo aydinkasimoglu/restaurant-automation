@@ -4,6 +4,22 @@
   if (error.value !== null) {
     console.error(`Menü yüklerken hata oluştu: ${error.value.message}`)
   }
+
+  const sil = async (id: number) => {
+    console.log(id)
+    if (confirm("Gerçekten silmek istiyor musun?")) {
+      const { data, error } = await useFetch(`/api/silSiparis/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (error.value !== null) {
+        console.error(`Sipariş silinirken hata oluştu: ${error.value.message}`)
+      } else {
+        alert(`${id} id'li sipariş silindi`)
+        location.reload()
+      }
+    }
+  }
 </script>
 
 <template>
@@ -29,8 +45,10 @@
           <div>{{ new Date(siparis.tarih).toLocaleString("tr-TR") }}</div>
         </div>
         <div>{{ siparis.fiyat }}₺</div>
+        <button type="button" class="siparis-sil" title="Siparişi Sil" @click="sil(siparis.siparis_id)"><i class="fa-solid fa-trash"></i></button>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -48,7 +66,7 @@
 
 .siparis {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 2fr 0.4fr 0.4fr;
   padding: 0.5rem;
   border-radius: 0.5rem;
   width: 100%;
@@ -90,6 +108,18 @@ img {
   width: 150px;
   height: 150px;
   border-radius: 0.5rem;
+}
+
+.siparis-sil {
+  border: none;
+  background-color: #EDDBC7;
+  padding: 0.5em;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.siparis-sil:hover {
+  background-color: #DCCBB8;
 }
 
 </style>
