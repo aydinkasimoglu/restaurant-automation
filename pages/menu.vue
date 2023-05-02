@@ -7,7 +7,6 @@ if (error) {
 </script>
 
 <template>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-6ClHcIwE2QYRyjtiBmziXp+9vDFl+WjKPaTfJqg0z8TywU6IIdn42GIVj2ySBU8Oe27bEvkP4J/4jZhcW8Nvsg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <div v-if="error">
     Bir hata oluştu
   </div>
@@ -18,11 +17,11 @@ if (error) {
     <div class="features-section">
       <form class="search-box">
         <input type="text" placeholder="Arama yap...">
-        <button type="submit">Ara</button>
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
       </form>
-      <button>Ürün Ekle</button>
-      <button>Ürün Sil</button>
-      <button>Ürün Düzenle</button>
+      <button><i class="fa-sharp fa-solid fa-plus"></i></button>
+      <button><i class="fa-solid fa-minus"></i></button>
+      <button><i class="fa-solid fa-pen-to-square"></i></button>
     </div>
     <div class="foods-section">
       <div class="food-box" v-for="yiyecek of yiyecekler" :key="yiyecek.ad">
@@ -38,30 +37,10 @@ if (error) {
     </div>
   </div>
 </template>
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  font-family: "Roboto Condensed", sans-serif;
-  --font-color: #24221c;
-  --button-color: #f7e9d9;
-}
-
-body {
-  display: flex;
-  justify-content: center;
-}
-
+<style scoped>
 .menu-container {
+  /*adds scrollbar to block overflow*/
   overflow-y: auto;
-  scrollbar-width: none;
-  width: 71rem;
-  color: var(--font-color);
-  background-color: var(--menu-background);
 }
 
 .features-section {
@@ -70,10 +49,12 @@ body {
   justify-content: flex-end;
   margin: 0px 15px;
 }
+
 .search-box {
   display: flex;
   align-items: center;
 }
+
 .search-box input[type="text"] {
   border: none;
   border-radius: 3px;
@@ -81,6 +62,7 @@ body {
   font-size: 16px;
   width: calc(100% - 80px);
 }
+
 .search-box button[type="submit"] {
   background-color: #fff;
   border: none;
@@ -89,6 +71,7 @@ body {
   font-size: 16px;
   padding: 6px 12px;
 }
+
 .features-section button {
   cursor: pointer;
   margin: 0.5rem 2px;
@@ -122,30 +105,38 @@ body {
   transform: translateY(-5px);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
+
 .foto {
   justify-content: center;
   align-items: center;
   display: flex;
-  height: 75%;
+  height: 80%;
 }
+
 .foto img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.info{
+
+.info {
   padding: 6px 16px 16px;
 }
-.info .type{
+
+.info .type {
+  display: block;
   font-size: 0.8rem;
   font-weight: 500;
 }
-.info .name{
+
+.info .name,
+.info .price {
+  display: inline-block;
   font-size: 1.1rem;
   font-weight: 700;
 }
-.info .price{
-  font-size: 1.1rem;
-  font-weight: 700;
+
+.info .price {
+  float: right;
 }
 </style>

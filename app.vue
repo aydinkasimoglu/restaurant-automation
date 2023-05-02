@@ -31,10 +31,24 @@
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap");
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: "Roboto Condensed", sans-serif;
+  --font-color: #24221c;
+  --button-color: #f7e9d9;
+}
+
 body {
+  display: flex;
+  justify-content: center;
   overflow: hidden;
-  height: 100vh;
   background-color: #f9f5e7;
+  height: 100vh;
 }
 
 header {
@@ -42,14 +56,13 @@ header {
   flex-flow: row wrap;
   justify-content: space-between;
   align-items: center;
-  width: 71rem;
+  max-width: 70rem;
   position: relative;
   margin-top: 2rem;
 }
 
 img {
-  width: 180px;
-  height: auto;
+  width: 45%;
 }
 
 nav {
@@ -78,5 +91,9 @@ nav {
   align-items: center;
   margin-top: 2rem;
   height: calc(100vh - 9rem);
+  scrollbar-width: none;
+  width: 71rem;
+  color: var(--font-color);
+  background-color: var(--menu-background);
 }
 </style>
