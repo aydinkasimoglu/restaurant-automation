@@ -75,6 +75,7 @@ const filteredYiyecekler = computed(() => {
 .menu-container {
   /*adds scrollbar to block overflow*/
   overflow-y: auto;
+  margin-top: 0.6rem;
 }
 
 .features-section {
