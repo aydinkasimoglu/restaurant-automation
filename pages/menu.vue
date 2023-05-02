@@ -121,6 +121,8 @@ if (error) {
 
 .info {
   padding: 6px 16px 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .info .type {
@@ -132,11 +134,20 @@ if (error) {
 .info .name,
 .info .price {
   display: inline-block;
-  font-size: 1.1rem;
-  font-weight: 700;
 }
 
 .info .price {
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 45px;
+  height: 40px;
+  align-items: center;
+  margin: -0.75rem;
+  padding: 0.40rem;
+  background-color: rgb(230, 204, 173);
+  border-radius: 3rem;
   float: right;
 }
 </style>
