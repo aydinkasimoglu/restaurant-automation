@@ -1,11 +1,35 @@
 <script lang="ts" setup>
+import { ref, computed } from 'vue'
 const { data: yiyecekler, pending, error } = await useFetch('/api/menu')
 
 if (error) {
   console.log(`Menü yüklerken hata oluştu: ${error.value?.message}`)
 }
-</script>
+const searchValue = ref('')
+const allYiyecekler = ref([])
+const categories = ['İçecekler', 'Tatlılar', 'Hamburgerler', 'Çorbalar', 'Salatalar', 'Et Yemekleri']
 
+const filterByCategory = (category: string) => {
+  if (categories.includes(category)) {
+    const filteredYiyecekler = allYiyecekler.value.filter(yiyecek => yiyecek.tur === category)
+    yiyecekler.value = filteredYiyecekler
+  } else {
+    yiyecekler.value = allYiyecekler.value
+  }
+}
+// Store the all yiyecekler in originalYiyecekler
+allYiyecekler.value = yiyecekler.value
+// Computed property for the filtered yiyecekler based on the search value
+const filteredYiyecekler = computed(() => {
+  const searchTerm = searchValue.value.toLowerCase().trim()
+  if (!searchTerm) {
+    return yiyecekler.value
+  }
+  return yiyecekler.value.filter(yiyecek =>
+    yiyecek.ad.toLowerCase().includes(searchTerm)
+  )
+})
+</script>
 <template>
   <div v-if="error">
     Bir hata oluştu
@@ -15,16 +39,26 @@ if (error) {
   </div>
   <div class="menu-container" v-else>
     <div class="features-section">
+      <!-- Category buttons -->
+      <button @click="filterByCategory('')">Tümü</button>
+      <button @click="filterByCategory('İçecekler')">İçecekler</button>
+      <button @click="filterByCategory('Tatlılar')">Tatlılar</button>
+      <button @click="filterByCategory('Hamburgerler')">Hamburgerler</button>
+      <button @click="filterByCategory('Çorbalar')">Çorbalar</button>
+      <button @click="filterByCategory('Salatalar')">Salatalar</button>
+      <button @click="filterByCategory('Et Yemekleri')">Et Yemekleri</button>
+      <!-- Search box -->
       <form class="search-box">
-        <input type="text" placeholder="Arama yap...">
+        <input type="text" placeholder="Arama yap..." v-model="searchValue">
         <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
       </form>
       <button><i class="fa-sharp fa-solid fa-plus"></i></button>
       <button><i class="fa-solid fa-minus"></i></button>
       <button><i class="fa-solid fa-pen-to-square"></i></button>
     </div>
+    <!-- Foods section -->
     <div class="foods-section">
-      <div class="food-box" v-for="yiyecek of yiyecekler" :key="yiyecek.ad">
+      <div class="food-box" v-for="yiyecek of filteredYiyecekler" :key="yiyecek.ad">
         <div class="foto">
           <img :src="yiyecek.fotograf">
         </div>
@@ -80,7 +114,7 @@ if (error) {
   font-weight: bold;
   background-color: var(--button-color);
   color: var(--menu-background);
-  border-radius: 5px;
+  border-radius: 20px;
   border: none;
 }
 
