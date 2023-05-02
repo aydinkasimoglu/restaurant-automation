@@ -1,9 +1,10 @@
 <script lang="ts" setup>
   onMounted(async () => {
-    if (document.cookie.split("; ").find((row) => row.startsWith("dbCreated="))?.split("=")[1] !== "true") {
+    if (!document.cookie.split(";").some((item) => item.trim().startsWith("dbCreated="))) {
+      await nextTick()
       const { data } = await useFetch('/api/loadDB')
       if (data.value !== null) {
-        document.cookie = "dbCreated=true"
+        document.cookie = "dbCreated=true; max-age=31536000"
       }
     }
   })
