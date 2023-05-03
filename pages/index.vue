@@ -11,6 +11,5 @@
     flex-flow: column wrap;
     justify-content: center;
     align-items: center;
-    font-family: "Roboto Condensed", sans-serif;
   }
 </style>
