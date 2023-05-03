@@ -50,11 +50,8 @@ const filteredYiyecekler = computed(() => {
       <!-- Search box -->
       <form class="search-box">
         <input type="text" placeholder="Arama yap..." v-model="searchValue">
-        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
       </form>
-      <button><i class="fa-sharp fa-solid fa-plus"></i></button>
-      <button><i class="fa-solid fa-minus"></i></button>
-      <button><i class="fa-solid fa-pen-to-square"></i></button>
     </div>
     <!-- Foods section -->
     <div class="foods-section">
@@ -74,7 +71,8 @@ const filteredYiyecekler = computed(() => {
 <style scoped>
 .menu-container {
   /*adds scrollbar to block overflow*/
-  height: calc(100vh - 9rem);
+  height: calc(100vh - 10rem);
+  width: 100%;
   overflow-y: auto;
   /*hide scrollbar for firefox*/
   scrollbar-width: none;
@@ -87,41 +85,53 @@ const filteredYiyecekler = computed(() => {
 .features-section {
   /*background-color: red;*/
   display: flex;
+  justify-content: center;
   margin: 0px 15px;
 }
-
-.search-box {
-  display: flex;
-  align-items: center;
-}
-
-.search-box input[type="text"] {
-  border: none;
-  border-radius: 3px;
-  padding: 6px 8px;
-  font-size: 16px;
-  width: calc(100% - 80px);
-}
-
-.search-box button[type="submit"] {
-  background-color: #fff;
-  border: none;
-  border-radius: 3px;
-  color: #606060;
-  font-size: 16px;
-  padding: 6px 12px;
-}
-
 .features-section button {
   cursor: pointer;
   margin: 0.5rem 2px;
-  padding: 10px 20px;
+  padding: 3px 20px;
   font-size: 1rem;
   font-weight: bold;
   background-color: var(--button-color);
   color: var(--menu-background);
   border-radius: 20px;
   border: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+.features-section button:hover {
+  background-color: #aaa;
+}
+.search-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  margin-left: 10px;
+  position: relative;
+}
+.search-box input[type=text] {
+  margin-left: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 16px;
+  outline: none;
+  width: 100%;
+}
+.search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.search-icon i {
+  font-size: 16px;
+  color: black; /* Adjust the color as needed */
 }
 
 .foods-section {
