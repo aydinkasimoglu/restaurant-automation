@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 const { data: yiyecekler, pending, error } = await useFetch('/api/menu')
 
 if (error) {
@@ -8,19 +8,26 @@ if (error) {
 const searchValue = ref('')
 const allYiyecekler = ref([])
 const categories = ['İçecekler', 'Tatlılar', 'Hamburgerler', 'Çorbalar', 'Salatalar', 'Et Yemekleri']
+const isLoading = ref(false);
 
 const filterByCategory = (category: string) => {
+  isLoading.value = true;
   if (categories.includes(category)) {
-    const filteredYiyecekler = allYiyecekler.value.filter(yiyecek => yiyecek.tur === category)
-    yiyecekler.value = filteredYiyecekler
+    const filteredYiyecekler = allYiyecekler.value.filter(
+      (yiyecek) => yiyecek.tur === category
+    );
+    yiyecekler.value = filteredYiyecekler;
   } else {
-    yiyecekler.value = allYiyecekler.value
+    yiyecekler.value = allYiyecekler.value;
   }
-}
-// Store the all yiyecekler in originalYiyecekler
+  setIsLoadingFalse(); // Call setIsLoadingFalse after updating yiyecekler.value
+};
+
+// Store the all yiyecekler
 allYiyecekler.value = yiyecekler.value
 // Computed property for the filtered yiyecekler based on the search value
 const filteredYiyecekler = computed(() => {
+  isLoading.value = true; // Set true
   const searchTerm = searchValue.value.toLowerCase().trim()
   if (!searchTerm) {
     return yiyecekler.value
@@ -29,7 +36,22 @@ const filteredYiyecekler = computed(() => {
     yiyecek.ad.toLowerCase().includes(searchTerm)
   )
 })
+
+let timeoutId; // Declare a variable to store the timeout ID
+
+const setIsLoadingFalse = () => {
+  clearTimeout(timeoutId); // Clear any existing timeout
+  timeoutId = setTimeout(() => {
+    isLoading.value = false;
+  }, 50);
+};
+
+
+watch(filteredYiyecekler, setIsLoadingFalse)
+setIsLoadingFalse(); // Set isLoading to false on initial load
 </script>
+
+
 <template>
   <div v-if="error">
     Bir hata oluştu
@@ -54,7 +76,7 @@ const filteredYiyecekler = computed(() => {
       </form>
     </div>
     <!-- Foods section -->
-    <div class="foods-section">
+      <div class="foods-section" :class="{ 'is-loading': isLoading }">
       <div class="food-box" v-for="yiyecek of filteredYiyecekler" :key="yiyecek.ad">
         <div class="foto">
           <img :src="yiyecek.fotograf">
@@ -139,6 +161,16 @@ const filteredYiyecekler = computed(() => {
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
+}
+.foods-section.is-loading {
+  opacity: 0.5; /* Reduce the opacity during loading */
+  pointer-events: none; /* Disable pointer events during loading */
+}
+
+.foods-section.is-loading .food-box {
+  transform: translateY(+30px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .food-box {
