@@ -74,14 +74,13 @@ const filteredYiyecekler = computed(() => {
 <style scoped>
 .menu-container {
   /*adds scrollbar to block overflow*/
+  height: calc(100vh - 9rem);
   overflow-y: auto;
-  margin-top: 0.6rem;
 }
 
 .features-section {
   /*background-color: red;*/
   display: flex;
-  justify-content: flex-end;
   margin: 0px 15px;
 }
 
