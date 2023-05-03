@@ -87,7 +87,6 @@ nav {
 #container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   margin-top: 2rem;
   height: calc(100vh - 9rem);
