@@ -6,19 +6,6 @@ if (error.value !== null) {
   console.error(`Yeni sipariş için yiyecekler yüklenirken hata oluştu: ${error.value.message}`)
 }
 
-if (yiyecekler.value !== null) {
-  // Yiyecek türlerine göre sırala
-  yiyecekler.value.sort((a, b) => {
-    if (a.tur < b.tur) {
-      return -1
-    }
-    if (a.tur > b.tur) {
-      return 1
-    }
-    return 0
-  })
-}
-
 let siparisAd: string
 let siparisAdet: string
 let siparisNo: string
