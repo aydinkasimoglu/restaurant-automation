@@ -16,7 +16,7 @@
   let duzenle: (id: number) => Promise<void>
 
   const id = useState('id', () => 0)
-  
+
   onMounted(() => {
     const edit = document.getElementById("siparis-edit")
     const siparisNoInput = document.getElementById("siparis-no")
@@ -24,7 +24,7 @@
     const siparisAdInput = document.getElementById("siparis-ad")
     const save = document.getElementById("siparis-kaydet")
     const close = document.getElementById("edit-kapat")
-    
+
     if (save) {
       save.addEventListener('click', () => duzenle(id.value))
     }
@@ -151,8 +151,13 @@
   gap: 1rem;
   overflow-y: auto;
   padding: 1em;
+  /*hide scrollbar for firefox*/
+  scrollbar-width: none;
 }
-
+#siparisler::-webkit-scrollbar {
+  /*hide scrollbar for edge*/
+  display: none;
+}
 .siparis {
   display: grid;
   grid-template-columns: 1fr 2fr 0.4fr 0.4fr 0.4fr;

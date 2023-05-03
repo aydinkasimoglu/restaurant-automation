@@ -91,7 +91,6 @@ nav {
   justify-content: center;
   margin-top: 2rem;
   height: calc(100vh - 9rem);
-  scrollbar-width: none;
   width: 71rem;
   color: var(--font-color);
   background-color: var(--menu-background);

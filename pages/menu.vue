@@ -76,6 +76,12 @@ const filteredYiyecekler = computed(() => {
   /*adds scrollbar to block overflow*/
   height: calc(100vh - 9rem);
   overflow-y: auto;
+  /*hide scrollbar for firefox*/
+  scrollbar-width: none;
+}
+.menu-container::-webkit-scrollbar {
+  /*hide scrollbar for edge*/
+  display: none;
 }
 
 .features-section {
