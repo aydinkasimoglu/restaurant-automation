@@ -1,6 +1,7 @@
 <script lang="ts" setup>
   const { data: siparisler, pending, error: siparisError } = await useFetch('/api/siparisler')
   const { data: yiyecekler, error: menuError } = await useFetch('/api/menu')
+  const { data: masalar, error: masaError } = await useFetch('/api/masalar')
 
   if (siparisError.value !== null) {
     console.error(`Menü yüklerken hata oluştu: ${siparisError.value.message}`)
@@ -97,8 +98,12 @@
   <div style="display: flex; flex-direction: column; align-items: flex-end;">
     <div id="siparis-edit" class="edit-kapali">
       <button type="button" id="edit-kapat" title="Düzenleme Alanını Kapat"><i class="fa-solid fa-times"></i></button>
+
       <label for="masa-id">Masa Numarası</label>
-      <input type="text" id="masa-id" placeholder="Masa Numarası" />
+      <select v-model="masaId" name="masaId" id="masa-id" title="Masa Numarası" required>
+        <option value="" disabled selected>Masa Numarası</option>
+        <option v-for="masa in masalar" :key="masa.id" :value="masa.id">{{ masa.id }}</option>
+      </select>
 
       <label for="siparis-adet">Sipariş Adedi</label>
       <input type="number" id="siparis-adet" placeholder="Sipariş Adedi" />
