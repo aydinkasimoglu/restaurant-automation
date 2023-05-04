@@ -1,7 +1,7 @@
 import mysql from "mysql"
 
 type Masa = {
-  no: number
+  id: number
   toplam_fiyat: number
 }
 
@@ -26,10 +26,10 @@ function getYiyeceklerList(connection: mysql.Connection) {
       console.log("Veri tabanı kullanıldı")
 
       connection.query(`
-				SELECT Siparis.siparis_no AS no, SUM(Yiyecek.fiyat * Siparis.adet) AS toplam_fiyat
+				SELECT Siparis.masa_id AS id, SUM(Yiyecek.fiyat * Siparis.adet) AS toplam_fiyat
 				FROM Siparis
 				JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
-				GROUP BY Siparis.siparis_no;
+				GROUP BY Siparis.masa_id;
       `, (error, results) => {
         if (error) reject(error)
         console.log("Masalar listelendi")

@@ -11,7 +11,7 @@
   }
 
   let sil: (id: number) => Promise<void>
-  let duzenleAc: (siparisId: number, siparisNo: number, siparisAdet: number, siparisAd: string) => void
+  let duzenleAc: (siparisId: number, masaId: number, siparisAdet: number, siparisAd: string) => void
   let duzenleKapat: () => void
   let duzenle: (id: number) => Promise<void>
 
@@ -19,7 +19,7 @@
 
   onMounted(() => {
     const edit = document.getElementById("siparis-edit")
-    const siparisNoInput = document.getElementById("siparis-no")
+    const masaIdInput = document.getElementById("masa-id")
     const siparisAdetInput = document.getElementById("siparis-adet")
     const siparisAdInput = document.getElementById("siparis-ad")
     const save = document.getElementById("siparis-kaydet")
@@ -49,12 +49,12 @@
       }
     }
 
-    duzenleAc = (siparisId: number, siparisNo: number, siparisAdet: number, siparisAd: string) => {
-      if (siparisNoInput === null || siparisAdetInput === null || siparisAdInput === null || edit === null) {
+    duzenleAc = (siparisId: number, masaId: number, siparisAdet: number, siparisAd: string) => {
+      if (masaIdInput === null || siparisAdetInput === null || siparisAdInput === null || edit === null) {
         console.error('Sipariş düzenleme alanları bulunamadı')
         return
       }
-      (siparisNoInput as HTMLInputElement).value = siparisNo.toString();
+      (masaIdInput as HTMLInputElement).value = masaId.toString();
       (siparisAdetInput as HTMLInputElement).value = siparisAdet.toString();
       (siparisAdInput as HTMLSelectElement).value = siparisAd
       id.value = siparisId
@@ -77,7 +77,7 @@
         method: 'PUT',
         body: {
           siparisId: id,
-          siparisNo: (siparisNoInput as HTMLInputElement).value,
+          masaId: (masaIdInput as HTMLInputElement).value,
           siparisAdet: (siparisAdetInput as HTMLInputElement).value,
           siparisAd: (siparisAdInput as HTMLSelectElement).value
         }
@@ -97,8 +97,8 @@
   <div style="display: flex; flex-direction: column; align-items: flex-end;">
     <div id="siparis-edit" class="edit-kapali">
       <button type="button" id="edit-kapat" title="Düzenleme Alanını Kapat"><i class="fa-solid fa-times"></i></button>
-      <label for="siparis-no">Sipariş Numarası</label>
-      <input type="text" id="siparis-no" placeholder="Sipariş Numarası" />
+      <label for="masa-id">Masa Numarası</label>
+      <input type="text" id="masa-id" placeholder="Masa Numarası" />
 
       <label for="siparis-adet">Sipariş Adedi</label>
       <input type="number" id="siparis-adet" placeholder="Sipariş Adedi" />
@@ -127,14 +127,14 @@
       <div v-for="siparis of siparisler" class="siparis">
         <img :src="siparis.fotograf" alt="Yemeğin fotoğrafı"/>
         <div class="siparis-bilgi">
-          <div>#{{ siparis.siparis_no }}</div>
+          <div>#{{ siparis.masa_id }}</div>
           <div>{{ siparis.adet }} Adet</div>
           <div>{{ siparis.ad }} - {{ siparis.tur }}</div>
           <div>{{ new Date(siparis.tarih).toLocaleString("tr-TR") }}</div>
         </div>
         <div>{{ siparis.fiyat }}₺</div>
         <button type="button" class="siparis-sil" title="Siparişi Sil" @click="sil(siparis.siparis_id)"><i class="fa-solid fa-trash"></i></button>
-        <button type="button" class="siparis-duzenle" title="Siparişi Düzenle" @click="duzenleAc(siparis.siparis_id, siparis.siparis_no, siparis.adet, siparis.ad)"><i class="fa-solid fa-pen"></i></button>
+        <button type="button" class="siparis-duzenle" title="Siparişi Düzenle" @click="duzenleAc(siparis.siparis_id, siparis.masa_id, siparis.adet, siparis.ad)"><i class="fa-solid fa-pen"></i></button>
       </div>
     </div>
 

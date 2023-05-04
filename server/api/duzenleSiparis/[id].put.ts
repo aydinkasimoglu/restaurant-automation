@@ -4,7 +4,7 @@ type Body = {
   siparisId: number
   siparisAd: string
   siparisAdet: number
-  siparisNo: number
+  masaId: number
 }
 
 export default defineEventHandler(async event => {
@@ -30,7 +30,7 @@ function updateSiparis(connection: mysql.Connection, body: Body) {
 
       connection.query(`
         UPDATE Siparis
-        SET adet = ${body.siparisAdet}, yiyecek_id = (SELECT yiyecek_id FROM Yiyecek WHERE ad = '${body.siparisAd}'), siparis_no = ${body.siparisNo}
+        SET adet = ${body.siparisAdet}, yiyecek_id = (SELECT yiyecek_id FROM Yiyecek WHERE ad = '${body.siparisAd}'), masa_id = ${body.masaId}
         WHERE siparis_id = ${body.siparisId}`
       , (error, results) => {
         if (error) reject(error)

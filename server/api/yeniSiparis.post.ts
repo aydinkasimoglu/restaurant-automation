@@ -33,7 +33,7 @@ function insertSiparis(connection: mysql.Connection, body: Body) {
         const siparis_id: number = results[0]["COUNT(*)"]
 
         connection.query(`
-          INSERT INTO Siparis (siparis_id, adet, yiyecek_id, siparis_no)
+          INSERT INTO Siparis (siparis_id, adet, yiyecek_id, masa_id)
           VALUES (${siparis_id}, ${body.siparisAdet}, (SELECT yiyecek_id FROM Yiyecek WHERE ad = '${body.siparisAd}'), ${body.siparisNo})`
         , (error, results) => {
           if (error) reject(error)

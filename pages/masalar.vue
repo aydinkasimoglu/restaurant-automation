@@ -9,8 +9,8 @@ const { data: masalar, pending, error: siparisError } = await useFetch('/api/mas
 		Yükleniyor...
 	</div>
 	<div v-else>
-		<div v-for="masa of masalar" :key="masa.no">
-			<p class="no">Masa {{ masa.no }}</p>
+		<div v-for="masa of masalar" :key="masa.id">
+			<p class="no">Masa {{ masa.id }}</p>
 			<p class="totalcost">Ücret: {{ masa.toplam_fiyat }}₺</p>
 		</div>
 	</div>
