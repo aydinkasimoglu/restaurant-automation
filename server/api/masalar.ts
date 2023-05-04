@@ -27,15 +27,27 @@ function getYiyeceklerList(connection: mysql.Connection) {
       console.log("Veri tabanı kullanıldı")
 
       connection.query(`
-        SELECT Masa.masa_id AS id, Masa.dolu, SUM(Yiyecek.fiyat * Siparis.adet) AS toplam_fiyat
-        FROM Masa
-        LEFT JOIN Siparis ON Masa.masa_id = Siparis.masa_id
-        LEFT JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
-        GROUP BY Masa.masa_id, Masa.dolu
-      `, (error, results) => {
+        UPDATE Masa
+        LEFT JOIN (
+          SELECT Siparis.masa_id, SUM(Yiyecek.fiyat * Siparis.adet) AS toplam_fiyat
+          FROM Siparis
+          LEFT JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
+          GROUP BY Siparis.masa_id
+        ) AS Calculated ON Masa.masa_id = Calculated.masa_id
+        SET Masa.toplam_fiyat = IFNULL(Calculated.toplam_fiyat, 0),
+            Masa.dolu = CASE WHEN IFNULL(Calculated.toplam_fiyat, 0) <> 0 THEN 1 ELSE 0 END
+      `, (error, updateResult) => {
         if (error) reject(error)
-        console.log("Masalar listelendi")
-        resolve(results)
+
+        connection.query(`
+          SELECT masa_id AS id, dolu, toplam_fiyat
+          FROM Masa
+        `, (error, selectResult) => {
+          if (error) reject(error)
+
+          console.log("Masalar listelendi")
+          resolve(selectResult)
+        })
       })
     })
   })
