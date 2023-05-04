@@ -8,13 +8,9 @@ if (error.value !== null) {
 const searchValue = useState('searchValue', () => '')
 const allYiyecekler = useState('allYiyecekler', () => [] as unknown as (typeof yiyecekler))
 const categories = ['İçecekler', 'Tatlılar', 'Hamburgerler', 'Çorbalar', 'Salatalar', 'Et Yemekleri']
-const isLoading = useState('isLoading', () => false)
-
-let timeout: NodeJS.Timeout
+allYiyecekler.value = yiyecekler.value
 
 const filteredYiyecekler = computed(() => {
-  isLoading.value = true
-
   const searchTerm = searchValue.value.toLowerCase().trim()
 
   if (!searchTerm) {
@@ -28,11 +24,7 @@ const filteredYiyecekler = computed(() => {
   }
 })
 
-allYiyecekler.value = yiyecekler.value
-
 const filterByCategory = (category: string) => {
-  isLoading.value = true
-
   // Seçilen kategori geçerliyse ve allYiyecekler'in değeri varsa, verileri kategoriye göre filtrele
   if (categories.includes(category) && allYiyecekler.value) {
     const filteredYiyecekler = allYiyecekler.value.filter((yiyecek) => yiyecek.tur === category)
@@ -40,24 +32,8 @@ const filterByCategory = (category: string) => {
   } else {
     yiyecekler.value = allYiyecekler.value
   }
-
-  setIsLoadingFalse()
 }
-
-const setIsLoadingFalse = () => {
-  clearTimeout(timeout)
-
-  timeout = setTimeout(() => {
-    isLoading.value = false
-  }, 50)
-}
-
-// filteredYiyecekler'deki değişiklikleri izle ve bir değişiklik olduğunda setIsLoadingFalse'u çağır
-watch(filteredYiyecekler, setIsLoadingFalse)
-
-setIsLoadingFalse()
 </script>
-
 
 <template>
   <div v-if="error">
@@ -83,7 +59,7 @@ setIsLoadingFalse()
       </form>
     </div>
     <!-- Foods section -->
-      <div class="foods-section" :class="{ 'is-loading': isLoading }">
+      <div class="foods-section">
       <div class="food-box" v-for="yiyecek of filteredYiyecekler" :key="yiyecek.ad">
         <div class="foto">
           <img :src="yiyecek.fotograf">
@@ -168,16 +144,6 @@ setIsLoadingFalse()
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
-}
-.foods-section.is-loading {
-  opacity: 0.5; /* Reduce the opacity during loading */
-  pointer-events: none; /* Disable pointer events during loading */
-}
-
-.foods-section.is-loading .food-box {
-  transform: translateY(+30px);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .food-box {
