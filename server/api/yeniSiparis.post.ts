@@ -3,7 +3,7 @@ import mysql from "mysql"
 type Body = {
   siparisAd: string
   siparisAdet: number
-  siparisNo: number
+  masaId: number
 }
 
 export default defineEventHandler(async event => {
@@ -34,7 +34,7 @@ function insertSiparis(connection: mysql.Connection, body: Body) {
 
         connection.query(`
           INSERT INTO Siparis (siparis_id, adet, yiyecek_id, masa_id)
-          VALUES (${siparis_id}, ${body.siparisAdet}, (SELECT yiyecek_id FROM Yiyecek WHERE ad = '${body.siparisAd}'), ${body.siparisNo})`
+          VALUES (${siparis_id}, ${body.siparisAdet}, (SELECT yiyecek_id FROM Yiyecek WHERE ad = '${body.siparisAd}'), ${body.masaId})`
         , (error, results) => {
           if (error) reject(error)
           console.log("Yeni sipariş eklendi")
