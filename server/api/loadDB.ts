@@ -33,64 +33,94 @@ const yiyecek = [
   [21, "Tavukburger", 3, 20, "https://tinyurl.com/t5vcbezt"],
 ]
 
-export default defineEventHandler(event => {
-  const connection: mysql.Connection = event.context.connection
+const masa = [
+  [1, 0, 0],
+  [2, 0, 0],
+  [3, 0, 0],
+  [4, 0, 0],
+  [5, 0, 0],
+  [6, 0, 0],
+  [7, 0, 0],
+  [8, 0, 0],
+  [9, 0, 0],
+  [10, 0, 0],
+]
 
-  // Gerekli veri tabanı ve tablolar yoksa oluştur ve verileri ekle
+export default defineEventHandler(event => {
+  const connection: mysql.Connection = event.context.connection;
+
   connection.query("DROP DATABASE IF EXISTS Restoran", error => {
-    if (error) throw error
-    console.log("Veri tabanı düşürüldü")
+    if (error) throw error;
+    console.log("Veri tabanı düşürüldü");
 
     connection.query("CREATE DATABASE IF NOT EXISTS Restoran", error => {
-      if (error) throw error
-      console.log("Veri tabanı oluşturuldu")
+      if (error) throw error;
+      console.log("Veri tabanı oluşturuldu");
 
       connection.query("USE Restoran", error => {
-        if (error) throw error
-        console.log("Veri tabanı kullanıldı")
+        if (error) throw error;
+        console.log("Veri tabanı kullanıldı");
 
         connection.query("DROP TABLE IF EXISTS YiyecekTur", error => {
-          if (error) throw error
-          console.log("Yiyecek türü tablosu düşürüldü")
+          if (error) throw error;
+          console.log("Yiyecek türü tablosu düşürüldü");
 
           connection.query("CREATE TABLE IF NOT EXISTS YiyecekTur (yiyecektur_id INT NOT NULL PRIMARY KEY, ad NVARCHAR(25) NOT NULL)", error => {
-            if (error) throw error
-            console.log("Yiyecek türü tablosu oluşturuldu")
+            if (error) throw error;
+            console.log("Yiyecek türü tablosu oluşturuldu");
 
             connection.query("DROP TABLE IF EXISTS Yiyecek", error => {
-              if (error) throw error
-              console.log("Yiyecek tablosu düşürüldü")
+              if (error) throw error;
+              console.log("Yiyecek tablosu düşürüldü");
 
               connection.query("CREATE TABLE IF NOT EXISTS Yiyecek (yiyecek_id INT NOT NULL PRIMARY KEY, ad NVARCHAR(25) NOT NULL, tur_id INT NOT NULL, fiyat INT NOT NULL, fotograf NVARCHAR(30) NOT NULL, INDEX yiyecektur_id_idx (tur_id ASC) VISIBLE, CONSTRAINT yiyecektur_id FOREIGN KEY (tur_id) REFERENCES YiyecekTur(yiyecektur_id))", error => {
-                if (error) throw error
-                console.log("Yiyecek tablosu oluşturuldu")
+                if (error) throw error;
+                console.log("Yiyecek tablosu oluşturuldu");
 
                 connection.query("INSERT INTO YiyecekTur (yiyecektur_id, ad) VALUES ?", [tur], (error, result) => {
-                  if (error) throw error
-                  console.log(`Yiyecek türü tablosuna ${result.affectedRows} satır eklendi`)
-                })
+                  if (error) throw error;
+                  console.log(`Yiyecek türü tablosuna ${result.affectedRows} satır eklendi`);
+                });
 
                 connection.query("INSERT INTO Yiyecek (yiyecek_id, ad, tur_id, fiyat, fotograf) VALUES ?", [yiyecek], (error, result) => {
-                  if (error) throw error
-                  console.log(`Yiyecek tablosuna ${result.affectedRows} satır eklendi`)
-                })
+                  if (error) throw error;
+                  console.log(`Yiyecek tablosuna ${result.affectedRows} satır eklendi`);
+                });
 
                 connection.query("DROP TABLE IF EXISTS Siparisler", error => {
-                  if (error) throw error
-                  console.log("Siparişler tablosu düşürüldü")
+                  if (error) throw error;
+                  console.log("Siparişler tablosu düşürüldü");
 
                   connection.query("CREATE TABLE IF NOT EXISTS Siparis (siparis_id INT NOT NULL PRIMARY KEY, yiyecek_id INT NOT NULL, masa_id INT NOT NULL, adet TINYINT NOT NULL, siparis_tarih DATETIME DEFAULT CURRENT_TIMESTAMP, INDEX siparis_yiyecek_id_idx (yiyecek_id ASC) VISIBLE, CONSTRAINT siparis_yiyecek_id FOREIGN KEY (yiyecek_id) REFERENCES Yiyecek(yiyecek_id))", error => {
-                    if (error) throw error
-                    console.log("Siparişler tablosu oluşturuldu")
-                  })
-                })
-              })
-            })
-          })
-        })
-      })
-    })
-  })
+                    if (error) throw error;
+                    console.log("Siparişler tablosu oluşturuldu");
+                  });
+                });
 
-  return true
-})
+                connection.query("DROP TABLE IF EXISTS Masa", error => {
+                  if (error) throw error;
+                  console.log("Masa tablosu düşürüldü");
+
+                  connection.query("CREATE TABLE IF NOT EXISTS Masa (masa_id INT NOT NULL PRIMARY KEY,dolu TINYINT NOT NULL,toplam_fiyat INT DEFAULT 0)",
+                    error => {
+                      if (error) throw error;
+                      console.log("Masa tablosu oluşturuldu");
+
+                      connection.query("INSERT INTO Masa (masa_id, dolu, toplam_fiyat) VALUES ?", [masa], (error, result) => {
+                        if (error) throw error;
+                        console.log(`Masa türü tablosuna ${result.affectedRows} satır eklendi`);
+                      });
+                    });
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+
+  return true;
+});
+
+
