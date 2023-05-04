@@ -10,7 +10,7 @@ const { data: masalar, pending, error: siparisError } = await useFetch('/api/mas
 	</div>
 	<div class="masalar-container" v-else>
 		<div class="masalar-section" :class="{ 'is-loading': isLoading }">
-	    <div class="masa-box" v-for="masa of masalar" :key="masa.id">
+	    <div class="masa-box" v-for="masa of masalar" :key="masa.id" :class="{ 'green': masa.dolu === 1, 'red': masa.dolu === 0 }">
 				<div class="info">
 					<p class="tableId">Masa {{ masa.id }}</p>
 					<p class="isFree">Doluluk {{ masa.dolu }}</p>
@@ -38,6 +38,7 @@ const { data: masalar, pending, error: siparisError } = await useFetch('/api/mas
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
+  padding-top: 2rem;
 }
 .masalar-section.is-loading {
   opacity: 0.5; /* Reduce the opacity during loading */
@@ -51,17 +52,26 @@ const { data: masalar, pending, error: siparisError } = await useFetch('/api/mas
 }
 
 .masa-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: calc(25% - 30px);
   height: 13rem;
   background-color: antiquewhite;
-  border-radius: 10px;
+  border-radius: 3rem;
   margin: 15px;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
 }
+.masa-box.green {
+  background-color: green;
+}
 
+.masa-box.red {
+  background-color: red;
+}
 .masa-box:hover {
-  transform: translateY(-5px);
+  transform: translateY(-2px);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
