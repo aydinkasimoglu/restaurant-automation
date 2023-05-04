@@ -1,54 +1,61 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue'
 const { data: yiyecekler, pending, error } = await useFetch('/api/menu')
 
-if (error) {
-  console.log(`Menü yüklerken hata oluştu: ${error.value?.message}`)
+if (error.value !== null) {
+  console.log(`Menü yüklenirken hata oluştu: ${error.value.message}`)
 }
-const searchValue = ref('')
-const allYiyecekler = ref([])
+
+const searchValue = useState('searchValue', () => '')
+const allYiyecekler = useState('allYiyecekler', () => [] as unknown as (typeof yiyecekler))
 const categories = ['İçecekler', 'Tatlılar', 'Hamburgerler', 'Çorbalar', 'Salatalar', 'Et Yemekleri']
-const isLoading = ref(false);
+const isLoading = useState('isLoading', () => false)
 
-const filterByCategory = (category: string) => {
-  isLoading.value = true;
-  if (categories.includes(category)) {
-    const filteredYiyecekler = allYiyecekler.value.filter(
-      (yiyecek) => yiyecek.tur === category
-    );
-    yiyecekler.value = filteredYiyecekler;
-  } else {
-    yiyecekler.value = allYiyecekler.value;
-  }
-  setIsLoadingFalse(); // Call setIsLoadingFalse after updating yiyecekler.value
-};
+let timeout: NodeJS.Timeout
 
-// Store the all yiyecekler
-allYiyecekler.value = yiyecekler.value
-// Computed property for the filtered yiyecekler based on the search value
 const filteredYiyecekler = computed(() => {
-  isLoading.value = true; // Set true
+  isLoading.value = true
+
   const searchTerm = searchValue.value.toLowerCase().trim()
+
   if (!searchTerm) {
     return yiyecekler.value
   }
-  return yiyecekler.value.filter(yiyecek =>
-    yiyecek.ad.toLowerCase().includes(searchTerm)
-  )
+  
+  if (yiyecekler.value) {
+    return yiyecekler.value.filter(yiyecek =>
+      yiyecek.ad.toLowerCase().includes(searchTerm)
+    )
+  }
 })
 
-let timeoutId; // Declare a variable to store the timeout ID
+allYiyecekler.value = yiyecekler.value
+
+const filterByCategory = (category: string) => {
+  isLoading.value = true
+
+  // Seçilen kategori geçerliyse ve allYiyecekler'in değeri varsa, verileri kategoriye göre filtrele
+  if (categories.includes(category) && allYiyecekler.value) {
+    const filteredYiyecekler = allYiyecekler.value.filter((yiyecek) => yiyecek.tur === category)
+    yiyecekler.value = filteredYiyecekler
+  } else {
+    yiyecekler.value = allYiyecekler.value
+  }
+
+  setIsLoadingFalse()
+}
 
 const setIsLoadingFalse = () => {
-  clearTimeout(timeoutId); // Clear any existing timeout
-  timeoutId = setTimeout(() => {
-    isLoading.value = false;
-  }, 50);
-};
+  clearTimeout(timeout)
 
+  timeout = setTimeout(() => {
+    isLoading.value = false
+  }, 50)
+}
 
+// filteredYiyecekler'deki değişiklikleri izle ve bir değişiklik olduğunda setIsLoadingFalse'u çağır
 watch(filteredYiyecekler, setIsLoadingFalse)
-setIsLoadingFalse(); // Set isLoading to false on initial load
+
+setIsLoadingFalse()
 </script>
 
 
