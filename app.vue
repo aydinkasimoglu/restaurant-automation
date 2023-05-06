@@ -35,19 +35,23 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Roboto Condensed", sans-serif;
 }
 
 :root {
-  font-family: "Roboto Condensed", sans-serif;
-  --font-color: #24221c;
-  --button-color: #f7e9d9;
+  --dark-font-color: #24221C;
+  --light-font-color: #FFF5F5;
+  --primary-color: #F8EAD8;
+  --secondary-color: #EDDBC7;
+  --tertiary-color: #A7727D;
+  --background-color: #F9F5E7;
 }
 
 body {
   display: flex;
   justify-content: center;
   overflow: hidden;
-  background-color: #f9f5e7;
+  background-color: var(--background-color);
   height: 100vh;
 }
 
@@ -80,7 +84,7 @@ nav {
   font-family: "Roboto Condensed", sans-serif;
   font-weight: bold;
   text-decoration: none;
-  color: black;
+  color: var(--font-color);
   padding: 1rem clamp(1rem, 2vw, 2rem);
 }
 
@@ -92,7 +96,5 @@ nav {
   margin-top: 2rem;
   height: calc(100vh - 9rem);
   width: 71rem;
-  color: var(--font-color);
-  background-color: var(--menu-background);
 }
 </style>
