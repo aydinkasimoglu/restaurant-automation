@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-  const { data: siparisler, pending, error: siparisError } = await useFetch('/api/siparisler')
-  const { data: yiyecekler, error: menuError } = await useFetch('/api/menu')
-  const { data: masalar, error: masaError } = await useFetch('/api/masalar')
+  const { data: siparisler, pending: siparisPending, error: siparisError } = await useFetch('/api/siparisler')
+  const { data: yiyecekler, pending: menuPending, error: menuError } = await useFetch('/api/menu')
+  const { data: masalar, pending: masaPending, error: masaError } = await useFetch('/api/masalar')
 
   if (siparisError.value !== null) {
     console.error(`Siparişler yüklenirken hata oluştu: ${siparisError.value.message}`)
@@ -105,7 +105,7 @@
       <button type="button" id="edit-kapat" title="Düzenleme Alanını Kapat"><i class="fa-solid fa-times"></i></button>
 
       <label for="masa-id">Masa Numarası</label>
-      <select v-model="masaId" name="masaId" id="masa-id" title="Masa Numarası" required>
+      <select name="masa-id" id="masa-id" title="Masa Numarası" required>
         <option value="" disabled selected>Masa Numarası</option>
         <option v-for="masa in masalar" :key="masa.id" :value="masa.id">{{ masa.id }}</option>
       </select>
@@ -124,17 +124,17 @@
 
     <NuxtLink to="/siparisler/yeni" id="yeni-siparis">Yeni Sipariş</NuxtLink>
 
-    <div v-if="error">
+    <div v-if="siparisError || menuError || masaError">
       Bir hata oluştu
     </div>
-    <div v-else-if="pending">
+    <div v-else-if="siparisPending || menuPending || masaPending">
       Yükleniyor...
     </div>
     <div v-else-if="siparisler?.length == 0" id="siparisler">
       Sipariş bulunmamakta
     </div>
     <div v-else id="siparisler">
-      <div v-for="siparis of siparisler" class="siparis">
+      <div v-for="siparis of siparisler" :key="siparis.siparis_id" class="siparis">
         <img :src="siparis.fotograf" alt="Yemeğin fotoğrafı"/>
         <div class="siparis-bilgi">
           <div>#{{ siparis.masa_id }}</div>
