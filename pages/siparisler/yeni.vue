@@ -12,7 +12,11 @@ let siparisAdet: string
 let masaId: string
 
 const submit = async () => {
-  // /api/yeniSiparis adresine POST isteği gönder
+  if (parseInt(siparisAdet) <= 0) {
+    alert("Sipariş adedi sıfırdan büyük olmalıdır")
+    return
+  }
+
   const { data, error } = await useFetch('/api/yeniSiparis', {
     method: 'POST',
     body: {
