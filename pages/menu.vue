@@ -42,8 +42,8 @@ const filterByCategory = (category: string) => {
   <div v-else-if="pending">
     Yükleniyor...
   </div>
-  <div class="menu-container" v-else>
-    <div class="features-section">
+  <div id="menu-container" v-else>
+    <div id="features-section">
       <!-- Category buttons -->
       <button @click="filterByCategory('')">Tümü</button>
       <button @click="filterByCategory('İçecekler')">İçecekler</button>
@@ -53,13 +53,13 @@ const filterByCategory = (category: string) => {
       <button @click="filterByCategory('Salatalar')">Salatalar</button>
       <button @click="filterByCategory('Et Yemekleri')">Et Yemekleri</button>
       <!-- Search box -->
-      <form class="search-box">
+      <div id="search-box">
         <input type="text" placeholder="Arama yap..." v-model="searchValue">
-        <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
-      </form>
+        <span id="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+      </div>
     </div>
     <!-- Foods section -->
-      <div class="foods-section">
+    <div id="foods-section">
       <div class="food-box" v-for="yiyecek of filteredYiyecekler" :key="yiyecek.ad">
         <div class="foto">
           <img :src="yiyecek.fotograf">
@@ -74,41 +74,47 @@ const filterByCategory = (category: string) => {
   </div>
 </template>
 <style scoped>
-.menu-container {
-  /*adds scrollbar to block overflow*/
+#menu-container {
   height: calc(100vh - 10rem);
   width: 100%;
   overflow-y: auto;
   /*hide scrollbar for firefox*/
   scrollbar-width: none;
 }
-.menu-container::-webkit-scrollbar {
+
+#menu-container::-webkit-scrollbar {
   /*hide scrollbar for edge*/
   display: none;
 }
 
-.features-section {
-  /*background-color: red;*/
+#features-section {
   display: flex;
   justify-content: center;
   margin: 0px 15px;
 }
-.features-section button {
+
+#features-section > button {
   cursor: pointer;
   margin: 0.5rem 2px;
   padding: 3px 20px;
   font-size: 1rem;
-  font-weight: bold;
-  background-color: var(--button-color);
-  color: var(--menu-background);
-  border-radius: 20px;
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-decoration: none;
+  background-color: var(--tertiary-color);
+  color: var(--light-font-color);
+  border-radius: 0.2rem;
   border: none;
   transition: background-color 0.3s, color 0.3s;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
-.features-section button:hover {
-  background-color: #aaa;
+
+#features-section > button:hover {
+  box-shadow: rgba(0, 0, 0, 0.26) 0px 1px 4px 1px;
 }
-.search-box {
+
+#search-box {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -118,29 +124,30 @@ const filterByCategory = (category: string) => {
   margin-left: 10px;
   position: relative;
 }
-.search-box input[type=text] {
+
+#search-box > input[type=text] {
   margin-left: 1;
   padding: 12px 20px;
   border: none;
-  border-radius: 20px;
+  border-radius: 0.5rem;
   font-size: 16px;
   outline: none;
   width: 100%;
+  text-indent: 1.5rem;
+  user-select: none;
 }
-.search-icon {
+
+#search-icon {
   position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 1rem;
 }
 
-.search-icon i {
+#search-icon > i {
   font-size: 16px;
-  color: black; /* Adjust the color as needed */
+  color: black;
 }
 
-.foods-section {
-  /*background-color: blue;*/
+#foods-section {
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
@@ -150,7 +157,7 @@ const filterByCategory = (category: string) => {
   width: calc(25% - 30px);
   height: 18rem;
   background-color: antiquewhite;
-  border-radius: 10px;
+  border-radius: 0.5rem;
   margin: 15px;
   overflow: hidden;
   transition: transform 0.3s, box-shadow 0.3s;
@@ -168,7 +175,7 @@ const filterByCategory = (category: string) => {
   height: 80%;
 }
 
-.foto img {
+.foto > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
