@@ -18,8 +18,6 @@
       <NuxtLink to="/menu" class="nav-item">MENÜ</NuxtLink>
       <NuxtLink to="/siparisler" class="nav-item">SİPARİŞLER</NuxtLink>
       <NuxtLink to="/masalar" class="nav-item">MASALAR</NuxtLink>
-      <NuxtLink to="/stoklar" class="nav-item">STOKLAR</NuxtLink>
-      <NuxtLink to="/calisanlar" class="nav-item">ÇALIŞANLAR</NuxtLink>
     </nav>
   </header>
 
@@ -58,9 +56,8 @@ body {
 header {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
-  max-width: 70rem;
   position: relative;
   margin-top: 2rem;
 }
@@ -73,7 +70,7 @@ nav {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  background-color: #f8ead8;
+  background-color: var(--primary-color);
   border-radius: 5px;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
@@ -84,7 +81,7 @@ nav {
   font-family: "Roboto Condensed", sans-serif;
   font-weight: bold;
   text-decoration: none;
-  color: var(--font-color);
+  color: var(--dark-font-color);
   padding: 1rem clamp(1rem, 2vw, 2rem);
 }
 
