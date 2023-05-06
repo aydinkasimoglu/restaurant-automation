@@ -4,11 +4,15 @@
   const { data: masalar, error: masaError } = await useFetch('/api/masalar')
 
   if (siparisError.value !== null) {
-    console.error(`Menü yüklerken hata oluştu: ${siparisError.value.message}`)
+    console.error(`Siparişler yüklenirken hata oluştu: ${siparisError.value.message}`)
   }
 
   if (menuError.value !== null) {
-    console.error(`Menü yüklerken hata oluştu: ${menuError.value.message}`)
+    console.error(`Menü yüklenirken hata oluştu: ${menuError.value.message}`)
+  }
+
+  if (masaError.value !== null) {
+    console.error(`Masalar yüklenirken hata oluştu: ${masaError.value.message}`)
   }
 
   let sil: (id: number) => Promise<void>
@@ -23,12 +27,7 @@
     const masaIdInput = document.getElementById("masa-id")
     const siparisAdetInput = document.getElementById("siparis-adet")
     const siparisAdInput = document.getElementById("siparis-ad")
-    const save = document.getElementById("siparis-kaydet")
     const close = document.getElementById("edit-kapat")
-
-    if (save) {
-      save.addEventListener('click', () => duzenle(id.value))
-    }
 
     if (close) {
       close.addEventListener('click', () => duzenleKapat())
@@ -74,21 +73,27 @@
     }
 
     duzenle = async (id: number) => {
-      const { data, error } = await useFetch(`/api/duzenleSiparis/${id}`, {
-        method: 'PUT',
-        body: {
-          siparisId: id,
-          masaId: (masaIdInput as HTMLInputElement).value,
-          siparisAdet: (siparisAdetInput as HTMLInputElement).value,
-          siparisAd: (siparisAdInput as HTMLSelectElement).value
-        }
-      })
+      if (parseInt((siparisAdetInput as HTMLInputElement).value) <= 0) {
+        alert('Sipariş adeti sıfırdan büyük olmalı')
+        return
+      }
+      else {
+        const { data, error } = await useFetch(`/api/duzenleSiparis/${id}`, {
+          method: 'PUT',
+          body: {
+            siparisId: id,
+            masaId: (masaIdInput as HTMLInputElement).value,
+            siparisAdet: (siparisAdetInput as HTMLInputElement).value,
+            siparisAd: (siparisAdInput as HTMLSelectElement).value
+          }
+        })
 
-      if (error.value !== null) {
-        console.error(`Sipariş düzenlenirken hata oluştu: ${error.value.message}`)
-      } else {
-        alert(`${id} id'li sipariş düzenlendi`)
-        location.reload()
+        if (error.value !== null) {
+          console.error(`Sipariş düzenlenirken hata oluştu: ${error.value.message}`)
+        } else {
+          alert(`${id} id'li sipariş düzenlendi`)
+          location.reload()
+        }
       }
     }
   })
@@ -96,7 +101,7 @@
 
 <template>
   <div style="display: flex; flex-direction: column; align-items: flex-end;">
-    <div id="siparis-edit" class="edit-kapali">
+    <form @submit.prevent="duzenle(id)" id="siparis-edit" class="edit-kapali">
       <button type="button" id="edit-kapat" title="Düzenleme Alanını Kapat"><i class="fa-solid fa-times"></i></button>
 
       <label for="masa-id">Masa Numarası</label>
@@ -114,8 +119,8 @@
         <option v-for="yiyecek in yiyecekler" :key="yiyecek.ad">{{ yiyecek.ad }}</option>
       </select>
 
-      <button type="button" id="siparis-kaydet">Kaydet</button>
-    </div>
+      <button type="submit" id="siparis-kaydet">Kaydet</button>
+    </form>
 
     <NuxtLink to="/siparisler/yeni" id="yeni-siparis">Yeni Sipariş</NuxtLink>
 
@@ -190,17 +195,17 @@
   padding: 0.5em 1em;
   text-align: center;
   text-transform: uppercase;
-  background-color: #EDDBC7;
+  background-color: var(--tertiary-color);
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
   text-decoration: none;
-  color: black;
+  color: var(--light-font-color);
   font-family: "Roboto Condensed", sans-serif;
   font-weight: 500;
   transition: box-shadow 0.2s;
 }
 
 #yeni-siparis:hover {
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px 1px;
+  box-shadow: rgba(0, 0, 0, 0.26) 0px 1px 4px 1px;
 }
 
 img {
@@ -221,13 +226,20 @@ img {
   background-color: #DCCBB8;
 }
 
+#siparis-edit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .edit-acik {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1.5em;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
   border-radius: 0.5rem;
   background-color: #EDDBC7;
@@ -242,6 +254,27 @@ img {
 .edit-kapali {
   display: none;
   position: absolute;
+}
+
+#siparis-kaydet {
+  border: none;
+  border-radius: 0.2rem;
+  text-transform: uppercase;
+  background-color: var(--tertiary-color);
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  color: var(--light-font-color);
+  font-size: 15px;
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: 500;
+  transition: box-shadow 0.2s;
+  width: fit-content;
+  align-self: center;
+  padding: 0.5em 1em;
+  cursor: pointer;
+}
+
+#siparis-kaydet:hover {
+  box-shadow: rgba(0, 0, 0, 0.26) 0px 1px 4px 1px;
 }
 
 </style>
