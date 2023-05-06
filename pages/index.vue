@@ -10,5 +10,6 @@
     display: flex;
     flex-flow: column wrap;
     align-items: center;
+    text-align: center;
   }
 </style>
