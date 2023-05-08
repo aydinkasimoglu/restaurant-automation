@@ -137,7 +137,7 @@
       <div v-for="siparis of siparisler" :key="siparis.siparis_id" class="siparis">
         <img :src="siparis.fotograf" alt="Yemeğin fotoğrafı"/>
         <div class="siparis-bilgi">
-          <div>#{{ siparis.masa_id }}</div>
+          <div>Masa {{ siparis.masa_id }}</div>
           <div>{{ siparis.adet }} Adet</div>
           <div>{{ siparis.ad }} - {{ siparis.tur }}</div>
           <div>{{ new Date(siparis.tarih).toLocaleString("tr-TR") }}</div>
