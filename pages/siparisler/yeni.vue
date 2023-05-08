@@ -1,10 +1,14 @@
 <script lang="ts" setup>
 
-const { data: yiyecekler, pending, error } = await useFetch('/api/menu')
-const { data: masalar, error: menuError } = await useFetch('/api/masalar')
+const { data: yiyecekler, pending, error: menuError } = await useFetch('/api/menu')
+const { data: masalar, error: masaError } = await useFetch('/api/masalar')
 
-if (error.value !== null) {
-  console.error(`Yeni sipariş için yiyecekler yüklenirken hata oluştu: ${error.value.message}`)
+if (menuError.value !== null) {
+  console.error(`Yeni sipariş için yiyecekler yüklenirken hata oluştu: ${menuError.value.message}`)
+}
+
+if (masaError.value !== null) {
+  console.error(`Yeni sipariş için masalar yüklenirken hata oluştu: ${masaError.value.message}`)
 }
 
 let siparisAd: string
@@ -32,7 +36,7 @@ const submit = async () => {
   }
 
   alert(`${data.value} sipariş eklendi`)
-  location.href = '/siparisler'
+  navigateTo('/siparisler')
 }
 
 </script>
@@ -72,5 +76,20 @@ form {
   padding: 1em;
   background-color: #F8EAD8;
   border-radius: 0.5rem;
+}
+
+form > button {
+  margin: 0.5rem 2px;
+  padding: 3px 20px;
+  font-family: "Roboto Condensed", sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-decoration: none;
+  background-color: var(--tertiary-color);
+  color: var(--light-font-color);
+  border-radius: 0.2rem;
+  border: none;
+  transition: background-color 0.3s, color 0.3s;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
 </style>
