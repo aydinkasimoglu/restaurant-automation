@@ -18,6 +18,7 @@
       <NuxtLink to="/menu" class="nav-item">MENÜ</NuxtLink>
       <NuxtLink to="/siparisler" class="nav-item">SİPARİŞLER</NuxtLink>
       <NuxtLink to="/masalar" class="nav-item">MASALAR</NuxtLink>
+      <NuxtLink to="/calisanlar" class="nav-item">ÇALIŞANLAR</NuxtLink>
     </nav>
   </header>
 
