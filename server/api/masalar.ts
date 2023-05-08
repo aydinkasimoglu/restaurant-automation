@@ -24,33 +24,46 @@ function getYiyeceklerList(connection: mysql.Connection) {
   return new Promise((resolve, reject) => {
     connection.query("USE Restoran", error => {
       if (error) reject(error)
-      console.log("Veri tabanı kullanıldı")
 
       connection.query(`
         SELECT Siparis.masa_id, SUM(Yiyecek.fiyat * Siparis.adet) AS toplam_fiyat
         FROM Siparis
         JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
         GROUP BY Siparis.masa_id`
-      , (error: mysql.MysqlError, result: {masa_id: number, toplam_fiyat: number}[]) => {
+      , async (error: mysql.MysqlError, results: {masa_id: number, toplam_fiyat: number}[]) => {
         if (error) reject(error)
 
-        result.forEach(masa => {
-          connection.query(`
-            UPDATE Masa
-            SET toplam_fiyat = ${masa.toplam_fiyat}, dolu = ${masa.toplam_fiyat !== 0 ? 1 : 0}
-            WHERE masa_id = ${masa.masa_id}
-          `, (error) => {if (error) reject(error)})
-        })
+        for (let i = 1; i <= 10; i++) {
+          connection.query(`SELECT COUNT(*) FROM Siparis WHERE masa_id = ${i}`, (error, countResult) => {
+            if (error) reject(error)
 
-        connection.query(`
-          SELECT masa_id AS id, dolu, toplam_fiyat
-          FROM Masa
-        `, (error, selectResult) => {
-          if (error) reject(error)
+            const count: number = countResult[0]["COUNT(*)"]
 
-          console.log("Masalar listelendi")
-          resolve(selectResult)
-        })
+            if (count === 0) {
+              connection.query(`
+                UPDATE Masa
+                SET toplam_fiyat = 0, dolu = 0
+                WHERE masa_id = ${i}
+              `, (error) => {if (error) reject(error)})
+            }
+
+            if (count > 0) {
+              connection.query(`
+                UPDATE Masa
+                SET toplam_fiyat = ${results.find(item => item.masa_id === i)?.toplam_fiyat}, dolu = 1
+                WHERE masa_id = ${i}
+              `, (error) => {if (error) reject(error)})
+            }
+
+            if (i === 10) {
+              connection.query("SELECT Masa.masa_id AS id, dolu, toplam_fiyat FROM Masa", (error, result) => {
+                if (error) reject(error)
+
+                resolve(result)
+              })
+            }
+          })
+        }
       })
     })
   })
