@@ -116,22 +116,98 @@ export default defineEventHandler(event => {
                   connection.query("CREATE TABLE IF NOT EXISTS Siparis (siparis_id INT NOT NULL PRIMARY KEY, yiyecek_id INT NOT NULL, masa_id INT NOT NULL, adet TINYINT NOT NULL, siparis_tarih DATETIME DEFAULT CURRENT_TIMESTAMP, INDEX siparis_yiyecek_id_idx (yiyecek_id ASC) VISIBLE, CONSTRAINT siparis_yiyecek_id FOREIGN KEY (yiyecek_id) REFERENCES Yiyecek(yiyecek_id))", error => {
                     if (error) throw error
                     console.log("Siparişler tablosu oluşturuldu")
-                  })
-                })
 
-                connection.query("DROP TABLE IF EXISTS Masa", error => {
-                  if (error) throw error
-                  console.log("Masa tablosu düşürüldü")
-
-                  connection.query("CREATE TABLE IF NOT EXISTS Masa (masa_id INT NOT NULL PRIMARY KEY,dolu TINYINT NOT NULL,toplam_fiyat INT DEFAULT 0)",
-                    error => {
+                    connection.query("DROP TABLE IF EXISTS Masa", error => {
                       if (error) throw error
-                      console.log("Masa tablosu oluşturuldu")
+                      console.log("Masa tablosu düşürüldü")
+    
+                      connection.query("CREATE TABLE IF NOT EXISTS Masa (masa_id INT NOT NULL PRIMARY KEY,dolu TINYINT NOT NULL,toplam_fiyat INT DEFAULT 0)",
+                        error => {
+                          if (error) throw error
+                          console.log("Masa tablosu oluşturuldu")
+    
+                          connection.query("INSERT INTO Masa (masa_id, dolu, toplam_fiyat) VALUES ?", [masa], (error, result) => {
+                            if (error) throw error
+                            console.log(`Masa türü tablosuna ${result.affectedRows} satır eklendi`)
+                          })
 
-                      connection.query("INSERT INTO Masa (masa_id, dolu, toplam_fiyat) VALUES ?", [masa], (error, result) => {
-                        if (error) throw error
-                        console.log(`Masa türü tablosuna ${result.affectedRows} satır eklendi`)
+                          connection.query(`
+                            CREATE TRIGGER siparis_masa_insert
+                            AFTER INSERT ON Siparis
+                            FOR EACH ROW
+                            BEGIN
+                              UPDATE Masa
+                              SET toplam_fiyat = (SELECT SUM(Yiyecek.fiyat * Siparis.adet) FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id GROUP BY Siparis.masa_id HAVING Siparis.masa_id = NEW.masa_id), dolu = 1
+                              WHERE masa_id = NEW.masa_id;
+                            END
+                          `)
+
+                          connection.query(`
+                            CREATE TRIGGER siparis_masa_delete
+                            AFTER DELETE ON Siparis
+                            FOR EACH ROW
+                            BEGIN
+                              UPDATE Masa
+                              SET toplam_fiyat = (SELECT SUM(Yiyecek.fiyat * Siparis.adet) FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id GROUP BY Siparis.masa_id HAVING Siparis.masa_id = OLD.masa_id), dolu = 1
+                              WHERE masa_id = OLD.masa_id;
+
+                              UPDATE Masa
+                              SET toplam_fiyat = 0, dolu = 0
+                              WHERE (SELECT COUNT(*) FROM Siparis WHERE masa_id = OLD.masa_id) = 0;
+                            END
+                          `)
+
+                          connection.query(`
+                            CREATE TRIGGER siparis_masa_update
+                            AFTER UPDATE ON Siparis
+                            FOR EACH ROW
+                            BEGIN
+                              DECLARE masa_toplam INT;
+                              DECLARE masa_dolu TINYINT;
+                                
+                              SELECT SUM(adet * fiyat) INTO masa_toplam
+                              FROM Siparis s
+                              JOIN Yiyecek y ON s.yiyecek_id = y.yiyecek_id
+                              WHERE s.masa_id = NEW.masa_id;
+                                
+                              IF masa_toplam IS NULL THEN
+                                SET masa_toplam = 0;
+                              END IF;
+                                
+                              IF masa_toplam = 0 THEN
+                                SET masa_dolu = 0;
+                              ELSE
+                                SET masa_dolu = 1;
+                              END IF;
+                                
+                              UPDATE Masa
+                              SET toplam_fiyat = masa_toplam, dolu = masa_dolu
+                              WHERE masa_id = NEW.masa_id;
+                                
+                              IF (OLD.masa_id <> NEW.masa_id) THEN
+                                SELECT SUM(adet * fiyat) INTO masa_toplam
+                                FROM Siparis s
+                                JOIN Yiyecek y ON s.yiyecek_id = y.yiyecek_id
+                                WHERE s.masa_id = OLD.masa_id;
+                                    
+                                IF masa_toplam IS NULL THEN
+                                  SET masa_toplam = 0;
+                                END IF;
+                                    
+                                IF masa_toplam = 0 THEN
+                                  SET masa_dolu = 0;
+                                ELSE
+                                  SET masa_dolu = 1;
+                                END IF;
+                                    
+                                UPDATE Masa
+                                SET toplam_fiyat = masa_toplam, dolu = masa_dolu
+                                WHERE masa_id = OLD.masa_id;
+                              END IF;
+                            END
+                          `)
                       })
+                    })
                   })
                 })
 
@@ -174,5 +250,3 @@ export default defineEventHandler(event => {
 
   return true
 })
-
-
