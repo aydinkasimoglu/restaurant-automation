@@ -42,7 +42,7 @@ const submit = async () => {
 </script>
 
 <template>
-  <div v-if="error">
+  <div v-if="menuError || masaError">
     Bir hata oluştu
   </div>
   <div v-else-if="pending">
