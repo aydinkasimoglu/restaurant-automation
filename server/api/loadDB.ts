@@ -136,8 +136,15 @@ export default defineEventHandler(event => {
                             AFTER INSERT ON Siparis
                             FOR EACH ROW
                             BEGIN
-                              UPDATE Masa
-                              SET toplam_fiyat = (SELECT SUM(Yiyecek.fiyat * Siparis.adet) FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id GROUP BY Siparis.masa_id HAVING Siparis.masa_id = NEW.masa_id), dolu = 1
+                              DECLARE masa_toplam INT;
+                              
+                              SELECT SUM(Yiyecek.fiyat * NEW.adet) INTO masa_toplam
+                              FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
+                              WHERE Siparis.masa_id = NEW.masa_id;
+                              
+                              UPDATE Masa SET 
+                                toplam_fiyat = masa_toplam,
+                                dolu = 1
                               WHERE masa_id = NEW.masa_id;
                             END
                           `)
@@ -147,13 +154,16 @@ export default defineEventHandler(event => {
                             AFTER DELETE ON Siparis
                             FOR EACH ROW
                             BEGIN
-                              UPDATE Masa
-                              SET toplam_fiyat = (SELECT SUM(Yiyecek.fiyat * Siparis.adet) FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id GROUP BY Siparis.masa_id HAVING Siparis.masa_id = OLD.masa_id), dolu = 1
+                              DECLARE masa_toplam INT;
+                              
+                              SELECT SUM(Yiyecek.fiyat * Siparis.adet) INTO masa_toplam
+                              FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
+                              WHERE Siparis.masa_id = OLD.masa_id;
+                              
+                              UPDATE Masa SET 
+                                toplam_fiyat = masa_toplam,
+                                dolu = IF((SELECT COUNT(*) FROM Siparis WHERE masa_id = OLD.masa_id) > 0, 1, 0)
                               WHERE masa_id = OLD.masa_id;
-
-                              UPDATE Masa
-                              SET toplam_fiyat = 0, dolu = 0
-                              WHERE (SELECT COUNT(*) FROM Siparis WHERE masa_id = OLD.masa_id) = 0;
                             END
                           `)
 
@@ -162,47 +172,37 @@ export default defineEventHandler(event => {
                             AFTER UPDATE ON Siparis
                             FOR EACH ROW
                             BEGIN
-                              DECLARE masa_toplam INT;
-                              DECLARE masa_dolu TINYINT;
-                                
-                              SELECT SUM(adet * fiyat) INTO masa_toplam
-                              FROM Siparis s
-                              JOIN Yiyecek y ON s.yiyecek_id = y.yiyecek_id
-                              WHERE s.masa_id = NEW.masa_id;
-                                
-                              IF masa_toplam IS NULL THEN
-                                SET masa_toplam = 0;
+                              DECLARE old_masa_toplam INT;
+                              DECLARE new_masa_toplam INT;
+                              DECLARE old_masa_dolu TINYINT;
+                              DECLARE new_masa_dolu TINYINT;
+                              
+                              SELECT SUM(Yiyecek.fiyat * OLD.adet) INTO old_masa_toplam
+                              FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
+                              WHERE Siparis.masa_id = OLD.masa_id;
+                              
+                              IF old_masa_toplam IS NULL THEN
+                                SET old_masa_toplam = 0;
                               END IF;
-                                
-                              IF masa_toplam = 0 THEN
-                                SET masa_dolu = 0;
+                              
+                              IF old_masa_toplam = 0 THEN
+                                SET old_masa_dolu = 0;
                               ELSE
-                                SET masa_dolu = 1;
+                                SET old_masa_dolu = 1;
                               END IF;
-                                
-                              UPDATE Masa
-                              SET toplam_fiyat = masa_toplam, dolu = masa_dolu
-                              WHERE masa_id = NEW.masa_id;
-                                
-                              IF (OLD.masa_id <> NEW.masa_id) THEN
-                                SELECT SUM(adet * fiyat) INTO masa_toplam
-                                FROM Siparis s
-                                JOIN Yiyecek y ON s.yiyecek_id = y.yiyecek_id
-                                WHERE s.masa_id = OLD.masa_id;
-                                    
-                                IF masa_toplam IS NULL THEN
-                                  SET masa_toplam = 0;
-                                END IF;
-                                    
-                                IF masa_toplam = 0 THEN
-                                  SET masa_dolu = 0;
-                                ELSE
-                                  SET masa_dolu = 1;
-                                END IF;
-                                    
-                                UPDATE Masa
-                                SET toplam_fiyat = masa_toplam, dolu = masa_dolu
-                                WHERE masa_id = OLD.masa_id;
+                              
+                              SELECT SUM(Yiyecek.fiyat * NEW.adet) INTO new_masa_toplam
+                              FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
+                              WHERE Siparis.masa_id = NEW.masa_id;
+                              
+                              IF new_masa_toplam IS NULL THEN
+                                SET new_masa_toplam = 0;
+                              END IF;
+                              
+                              IF new_masa_toplam = 0 THEN
+                                SET new_masa_dolu = 0;
+                              ELSE
+                                SET new_masa_dolu = 1;
                               END IF;
                             END
                           `)
@@ -226,6 +226,16 @@ export default defineEventHandler(event => {
                       connection.query("CREATE TABLE IF NOT EXISTS Calisan (calisan_id INT NOT NULL PRIMARY KEY, ad NVARCHAR(50) NOT NULL, soyad NVARCHAR(50) NOT NULL, pozisyon INT NOT NULL, maas DECIMAL NOT NULL, telefon_no BIGINT NOT NULL, cinsiyet NVARCHAR(5) NOT NULL, INDEX pozisyon_id_idx (pozisyon ASC) VISIBLE, CONSTRAINT pozisyon_id FOREIGN KEY (pozisyon) REFERENCES Pozisyon(pozisyon_id))", error => {
                         if (error) throw error
                         console.log("Çalışanlar tablosu oluşturuldu")
+
+                        connection.query("CREATE OR REPLACE VIEW Calisan_Erkek AS SELECT * FROM Calisan WHERE cinsiyet = 'Erkek'", error => {
+                          if (error) throw error
+                          console.log("Erkek çalışanlar görüntüsü oluşturuldu")
+                        })
+
+                        connection.query("CREATE OR REPLACE VIEW Calisan_Kadin AS SELECT * FROM Calisan WHERE cinsiyet = 'Kadın'", error => {
+                          if (error) throw error
+                          console.log("Kadın çalışanlar görüntüsü oluşturuldu")
+                        })
 
                         connection.query("INSERT INTO Pozisyon (pozisyon_id, ad) VALUES ?", [pozisyon], (error, result) => {
                           if (error) throw error
