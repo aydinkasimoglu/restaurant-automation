@@ -1,6 +1,7 @@
 import mysql from "mysql"
 
 type Yiyecek = {
+  id: number
   ad: string
   tur: string
   fiyat: number
@@ -28,7 +29,7 @@ function getYiyeceklerList(connection: mysql.Connection) {
       console.log("Veri tabanı kullanıldı")
 
       connection.query(`
-        SELECT Yiyecek.ad AS ad, Yiyecek.fiyat AS fiyat, YiyecekTur.ad AS tur, Yiyecek.fotograf AS fotograf
+        SELECT Yiyecek_id AS id,Yiyecek.ad AS ad, Yiyecek.fiyat AS fiyat, YiyecekTur.ad AS tur, Yiyecek.fotograf AS fotograf
         FROM Yiyecek
         JOIN YiyecekTur ON Yiyecek.tur_id = YiyecekTur.yiyecektur_id
       `, (error, results) => {
