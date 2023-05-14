@@ -31,11 +31,9 @@ function insertYiyecek(connection: mysql.Connection, body: Body) {
       connection.query("SELECT COUNT(*) FROM Yiyecek", (error, results) => {
         if (error) throw error
 
-        const yiyecek_id: number = results[0]["COUNT(*)"]
-
         connection.query(`
-          INSERT INTO Yiyecek (yiyecek_id, ad, tur_id, fiyat, fotograf)
-          VALUES (${yiyecek_id}, ${body.yiyecekAd}, (SELECT yiyecektur_id FROM YiyecekTur WHERE ad = '${body.yiyecekTur}'), ${body.yiyecekFiyat}}, ${body.yiyecekFotograf})`
+          INSERT INTO Yiyecek (ad, tur_id, fiyat, fotograf)
+          VALUES ('${body.yiyecekAd}', (SELECT yiyecektur_id FROM YiyecekTur WHERE ad = '${body.yiyecekTur}'), ${body.yiyecekFiyat}, '${body.yiyecekFotograf}')`
         , (error, results) => {
           if (error) reject(error)
           console.log("Yeni yiyecek eklendi")
