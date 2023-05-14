@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 const { data: yiyecekler, pending, error } = await useFetch('/api/menu')
+const { data: siparisler } = await useFetch('/api/siparisler')
 
 if (error.value !== null) {
   console.log(`Menü yüklenirken hata oluştu: ${error.value.message}`)
@@ -8,6 +9,20 @@ if (error.value !== null) {
 const searchValue = useState('searchValue', () => '')
 const allYiyecekler = useState('allYiyecekler', () => [] as unknown as (typeof yiyecekler))
 const categories = ['İçecekler', 'Tatlılar', 'Hamburgerler', 'Çorbalar', 'Salatalar', 'Et Yemekleri']
+
+const yiyecek = [
+  [1,  "Kola"],             [2,  "Fanta"],
+  [3,  "Ayran"],            [4,  "Su"],
+  [5,  "Sütlaç"],           [6,  "Baklava"],
+  [7,  "Künefe"],           [8,  "Ekler"],
+  [9,  "Köfte"],            [10, "Ciğer"],
+  [11, "Tantuni"],          [12, "Tas Kebabı"],
+  [13, "Mercimek Çorbası"], [14, "Domates Çorbası"],
+  [15, "Ezogelin Çorbası"], [16, "Tavuklu Salata"],
+  [17, "Mevsim Salata"],    [18, "Akdeniz Salata"],
+  [19, "Köfteburger"],      [20, "Cheeseburger"],
+  [21, "Tavukburger"],
+]
 
 let sil: (id: number) => Promise<void>
 let duzenleAc: (yiyecekAd: string, yiyecekFiyat: number, yiyecekTur: string, yiyecekFotograf: string, yiyecekId: number) => void
@@ -56,6 +71,24 @@ onMounted(() => {
   sil = async (id: number) => {
     console.log(id)
     if (confirm("Gerçekten silmek istiyor musun?")) {
+      // Silme işleminden önce siparişlerdeki yiyecekleri kontrol et
+      // Aynı yiyecekten sipariş verilmişse siparişlerin silinmesini iste
+      if (siparisler.value) {
+        const siparis = siparisler.value.filter(siparis => yiyecek.find(yiyecek => yiyecek[1] === siparis.ad))
+        if (siparis.length > 0) {
+          if (confirm("Bu yiyecekten sipariş verilmiş. Siparişleri de silmek istiyor musun?")) {
+            for (const s of siparis) {
+              const { data, error } = await useFetch(`/api/silSiparis/${s.siparis_id}`, {
+                method: 'DELETE'
+              })
+              if (error.value !== null) {
+                console.error(`Sipariş silinirken hata oluştu: ${error.value.message}`)
+              }
+            }
+          }
+        }
+      }
+
       const { data, error } = await useFetch(`/api/silYiyecek/${id}`, {
         method: 'DELETE'
       })
@@ -170,17 +203,16 @@ onMounted(() => {
           <img :src="yiyecek.fotograf">
         </div>
         <div class="info">
-          <p class="type">{{ yiyecek.tur }}</p>
-          <p class="name">{{ yiyecek.ad }}</p>
-          <p class="price">{{ yiyecek.fiyat }}₺</p>
-          <div class="edit">
-            <i class="fa-solid fa-pen-to-square" title="Yiyeceği düzenle"
-              @click="duzenleAc(yiyecek.ad, yiyecek.fiyat, yiyecek.tur, yiyecek.fotograf, yiyecek.id)">
-            </i>
-            <i class="fa-solid fa-trash" title="Siparişi Sil"
-              @click="sil(yiyecek.id)">
-            </i>
+          <div style="max-width: 5rem;">
+            <div class="type">{{ yiyecek.tur }}</div>
+            <div class="name">{{ yiyecek.ad }}</div>
           </div>
+          <div class="edit">
+            <button @click="duzenleAc(yiyecek.ad, yiyecek.fiyat, yiyecek.tur, yiyecek.fotograf, yiyecek.id)"><i class="fa-solid fa-pen-to-square" title="Yiyeceği düzenle"></i></button>
+            <span>|</span>
+            <button @click="sil(yiyecek.id)"><i class="fa-solid fa-trash" title="Siparişi Sil"></i></button>
+          </div>
+          <div class="price">{{ yiyecek.fiyat }}₺</div>
         </div>
       </div>
     </div>
@@ -313,20 +345,17 @@ onMounted(() => {
 }
 
 .info {
-  padding: 6px 16px 16px;
-  font-size: 1.1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
   font-weight: 700;
 }
 
 .info .type {
-  display: block;
   font-size: 0.8rem;
   font-weight: 500;
-}
-
-.info .name,
-.info .price {
-  display: inline-block;
 }
 
 .info .price {
@@ -339,27 +368,34 @@ onMounted(() => {
   align-items: center;
   margin: -0.75rem;
   padding: 0.40rem;
-  background-color: rgb(230, 204, 173);
-  border-radius: 3rem;
-  float: right;
+  background-color: var(--secondary-color);
+  border-radius: 1rem;
 }
 .info .edit{
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  font-size: small;
-  width: 45px;
-  height: 40px;
-  margin-top: -2rem;
-  margin-left: 8.5rem;
-  background-color: rgb(230, 204, 173);
-  color: rgb(0, 0, 0);
+  gap: 1.2rem;
+  background-color: var(--secondary-color);
   border-radius: 0.2rem;
-  border-radius: 3rem;
+  width: fit-content;
+  padding: 0.5em 0.6em;
 }
-.edit i{
-  margin: 0px 3px;
+
+.edit > span {
+  user-select: none;
+}
+
+.edit > button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+#yeni-yiyecek {
+  background-color: rgb(218, 89, 89);
+  color: var(--light-font-color);
 }
 
 #edit-kapat {
