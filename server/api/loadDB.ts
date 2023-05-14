@@ -95,7 +95,7 @@ export default defineEventHandler(event => {
               if (error) throw error
               console.log("Yiyecek tablosu düşürüldü")
 
-              connection.query("CREATE TABLE IF NOT EXISTS Yiyecek (yiyecek_id INT NOT NULL PRIMARY KEY, ad NVARCHAR(25) NOT NULL, tur_id INT NOT NULL, fiyat INT NOT NULL, fotograf NVARCHAR(30) NOT NULL, INDEX yiyecektur_id_idx (tur_id ASC) VISIBLE, CONSTRAINT yiyecektur_id FOREIGN KEY (tur_id) REFERENCES YiyecekTur(yiyecektur_id))", error => {
+              connection.query("CREATE TABLE IF NOT EXISTS Yiyecek (yiyecek_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ad NVARCHAR(25) NOT NULL, tur_id INT NOT NULL, fiyat INT NOT NULL, fotograf NVARCHAR(30) NOT NULL, INDEX yiyecektur_id_idx (tur_id ASC) VISIBLE, CONSTRAINT yiyecektur_id FOREIGN KEY (tur_id) REFERENCES YiyecekTur(yiyecektur_id))", error => {
                 if (error) throw error
                 console.log("Yiyecek tablosu oluşturuldu")
 
@@ -130,6 +130,23 @@ export default defineEventHandler(event => {
                             if (error) throw error
                             console.log(`Masa türü tablosuna ${result.affectedRows} satır eklendi`)
                           })
+
+                          connection.query(`
+                            CREATE TRIGGER yiyecek_update
+                            AFTER UPDATE ON Yiyecek
+                            FOR EACH ROW
+                            BEGIN
+                              DECLARE masa_toplam INT;
+
+                              SELECT SUM(Yiyecek.fiyat * Siparis.adet) INTO masa_toplam
+                              FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
+                              WHERE Siparis.yiyecek_id = NEW.yiyecek_id;
+
+                              UPDATE Masa SET
+                                toplam_fiyat = masa_toplam
+                              WHERE masa_id IN (SELECT masa_id FROM Siparis WHERE yiyecek_id = NEW.yiyecek_id);
+                            END
+                          `)
 
                           connection.query(`
                             CREATE TRIGGER siparis_masa_insert
@@ -172,38 +189,25 @@ export default defineEventHandler(event => {
                             AFTER UPDATE ON Siparis
                             FOR EACH ROW
                             BEGIN
-                              DECLARE old_masa_toplam INT;
-                              DECLARE new_masa_toplam INT;
-                              DECLARE old_masa_dolu TINYINT;
-                              DECLARE new_masa_dolu TINYINT;
-                              
-                              SELECT SUM(Yiyecek.fiyat * OLD.adet) INTO old_masa_toplam
-                              FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
-                              WHERE Siparis.masa_id = OLD.masa_id;
-                              
-                              IF old_masa_toplam IS NULL THEN
-                                SET old_masa_toplam = 0;
-                              END IF;
-                              
-                              IF old_masa_toplam = 0 THEN
-                                SET old_masa_dolu = 0;
-                              ELSE
-                                SET old_masa_dolu = 1;
-                              END IF;
-                              
-                              SELECT SUM(Yiyecek.fiyat * NEW.adet) INTO new_masa_toplam
+                              DECLARE masa_toplam INT;
+
+                              SELECT SUM(Yiyecek.fiyat * NEW.adet) INTO masa_toplam
                               FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
                               WHERE Siparis.masa_id = NEW.masa_id;
-                              
-                              IF new_masa_toplam IS NULL THEN
-                                SET new_masa_toplam = 0;
-                              END IF;
-                              
-                              IF new_masa_toplam = 0 THEN
-                                SET new_masa_dolu = 0;
-                              ELSE
-                                SET new_masa_dolu = 1;
-                              END IF;
+
+                              UPDATE Masa SET
+                                toplam_fiyat = masa_toplam,
+                                dolu = 1
+                              WHERE masa_id = NEW.masa_id;
+
+                              SELECT SUM(Yiyecek.fiyat * OLD.adet) INTO masa_toplam
+                              FROM Siparis JOIN Yiyecek ON Siparis.yiyecek_id = Yiyecek.yiyecek_id
+                              WHERE Siparis.masa_id = OLD.masa_id;
+
+                              UPDATE Masa SET
+                                toplam_fiyat = IF((SELECT COUNT(*) FROM Siparis WHERE masa_id = OLD.masa_id) > 0, masa_toplam, 0),
+                                dolu = IF((SELECT COUNT(*) FROM Siparis WHERE masa_id = OLD.masa_id) > 0, 1, 0)
+                              WHERE masa_id = OLD.masa_id;
                             END
                           `)
                       })
